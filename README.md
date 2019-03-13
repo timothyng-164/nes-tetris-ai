@@ -4,7 +4,7 @@
 2. Clone this repository
 3. Open FCEUX
 4. File -> Open ROM -> select "Tetris (U) [!]"
-5. In the game, go to level select screen and hover over level
+5. In the game, go to level select screen and hover over level 9
    * ![i.e.](/images/save_state_1.png)
 6. Save state to 1 (shift + F1)
 7. File -> Lua -> New Lua Script Window -> Browse -> select "main.lua"
