@@ -1,5 +1,4 @@
 -- bestmove.lua
---
 
 require("playfield")
 require("pieces")
@@ -11,7 +10,7 @@ piece_addr = 0x0062
 next_piece_addr = 0x00BF
 
 
-function get_best_move()
+function get_best_move(heuristic_parameters)
   local start_playfield = init_playfield()
   start_playfield.field = read_field()
   start_playfield = set_heuristics(start_playfield)
@@ -29,7 +28,12 @@ function get_best_move()
   -- search for move with highest reward
   for i=1, #fields_list do
     curr_playfield = fields_list[i][1]
-    reward = get_reward(curr_playfield, -1, 1, -2, -1)
+    reward = get_reward(curr_playfield,
+      heuristic_parameters.aggregate_height,
+      heuristic_parameters.complete_lines,
+      heuristic_parameters.holes,
+      heuristic_parameters.bumpiness
+    )
     if (reward > max_reward) then
       max_reward = reward
       index = i

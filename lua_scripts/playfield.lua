@@ -10,7 +10,7 @@ num_cols = 10
 --// Playfield "class"
 
 function init_playfield()
-  local playfield = {
+  return {
     field = {{}},            -- 10x20 array of all the pieces on the field
     col_heights = {},        -- heights of each column
     aggregate_height = 0,    -- sum of all column heights
@@ -18,7 +18,7 @@ function init_playfield()
     holes = 0,               -- number of empty spaces with at least 1 tile above
     bumpiness = 0            -- sum of abs differences between 2 adjacent columns
   }
-  return playfield
+
 end
 
 -- return field from current frame of game
@@ -141,9 +141,9 @@ end
 -- calculate total of heuristics linear function
 function set_heuristics(playfield)
   playfield.holes, playfield.col_heights = unpack(get_holes_and_col_heights(playfield.field))
+  playfield.complete_lines = get_complete_lines(playfield.field)
   playfield.aggregate_height = get_aggregate_height(playfield.col_heights)
   playfield.bumpiness = get_bumpiness(playfield.col_heights)
-  playfield.complete_lines = get_complete_lines(playfield.field)
   return playfield
 end
 

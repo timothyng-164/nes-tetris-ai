@@ -1,110 +1,75 @@
--- main.lua
+require("genetic_alg")
 
-require("playfield")
-require("best_move")
-require("pieces")
-
-
-game_state_addr = 0x00C0
-rand_seed_addr_1 = 0x0017
-rand_seed_addr_2 = 0x0018
-
-
---//-------------------------------------------------------------------
---// functions
-
-
-function set_random_addr()
-  memory.writebyte(rand_seed_addr_1, math.random(0, 255))
-  memory.writebyte(rand_seed_addr_2, math.random(0, 255))
-end
-
--- loads game state 1 and start game
--- save state should be on level select hovering over level 9
-function start_game()
-  local start_state = savestate.object(1)
-  savestate.load(start_state)
-  set_random_addr()
-  emu.frameadvance()
-  joypad.set(1, { start = true } )
-  frame_adv(5)
-end
-
-
-function frame_adv(frames)
-  for i = 1, frames do
-    emu.frameadvance()
-  end
-end
-
-
-function move_piece(best_col, piece, rotation)
-
-  local start_col = start_columns[rotation]
-  local move_list = {left = false, right = false, B = false, A = false}
-  while (best_col ~= start_col or piece ~= rotation) do
-    emu.frameadvance()
-    move_list = {left = false, right = false, B = false, A = false}
-
-    -- rotate piece B/A
-    if (piece > rotation) then    -- rotate counter-clockwise
-      move_list.B = true
-      rotation = rotation + 1
-    elseif (piece < rotation) then    -- rotate clockwise
-      move_list.A = true
-      rotation = rotation - 1
-    end
-
-    -- move piece left/right
-    if (best_col < start_col) then    -- move left
-      move_list.left = true
-      best_col = best_col + 1
-    elseif (best_col > start_col) then   -- move right
-      move_list.right = true
-      best_col = best_col - 1
-    end
-
-    joypad.set(1, move_list)
-    emu.frameadvance()
-  end
-end
-
-
---//-------------------------------------------------------------------
+--//------------------------------------------------------
 --// main
 
-emu.speedmode("turbo")    -- speed up game
-math.randomseed(os.time())
-start_game()
-local move_num = 1
-local old_field = read_field()
-local current_field
-local complete_lines = 0
+do
+  local population_size = 100
+  local children_size = math.floor(population_size * .5)    -- get 50 children for every new generation
+  local selection_rate = 0.5    -- select 10% of population for each crossover
+  local mutation_rate = 0.02    -- 2% chance of mutation for each crossover
+  local generation_limit = 2
+  local generation = 1
+  local move_limit = 300      -- move limit for each game played
+  local file_name = "populations/populations_" .. datetime() .. ".csv"
 
--- make first move
-local best_col, piece, rotation = unpack(get_best_move())
-move_piece(best_col, piece, rotation)
+  math.randomseed(os.time())
+  assert(selection_rate * population_size >= 2)  -- must have 2 children to crossover
+  assert(children_size >= 1)                     -- must have more than 1 child
 
-while (true) do
+  -- write header for csv file
+  write_table(file_name, "w", {"generation", "genome", "fitness", "complete_lines", "aggregate_height", "holes", "bumpiness"})
+  write_str(file_name, "a", "\n")
 
-  emu.frameadvance()
-  current_field = read_field()
-  -- move after piece is dropped
-  if (not fields_equal(old_field, current_field)) then
-    -- delay to compensate for line-clear animation
-    if (complete_lines > 0) then
-      complete_lines = 0
-      frame_adv(18)
-    -- calculate best move
-    else
-      print(move_num)
-      frame_adv(12)
-      local best_col, piece, rotation, best_field = unpack(get_best_move())
-      move_piece(best_col, piece, rotation)
-      old_field = deepcopy(current_field)
-      move_num = move_num + 1
-      complete_lines = get_complete_lines(best_field)
+  -- begin genetic algorithm
+  local population = init_population(population_size, move_limit)
+  local population = sort_by_fitness(population)
+  write_population(file_name, "a", population, generation)
+
+  generation = generation + 1
+  while (generation <= generation_limit) do
+    set_random_addr()   -- randomly seed game pieces
+    -- selection and crossover
+    local children = {}
+    for i=1, children_size do
+      local selected = select_genomes(population, selection_rate)     -- randomly select a percentage of population
+      selected = sort_by_fitness(selected)
+      local fittest_genome_1, fittest_genome_2 = selected[#selected], selected[#selected-1]   -- get 2 fittest genomes from selection
+      local child = crossover(fittest_genome_1, fittest_genome_2, mutation_rate)
+      table.insert(children, child)
+
+      -- -- print crossover results
+      -- print()
+      -- print("selected:", i)
+      -- print_table(selected)
+      -- print("fittest parent 1:", fittest_genome_1)
+      -- print("fittest parent 2:", fittest_genome_2)
+      -- print("child", i, ":", child)
     end
+
+    -- in population, replace least fit genomes with new children
+    for i=1, children_size do
+      population[i] = children[i]
+    end
+
+    population = set_population_fitness(population, move_limit, generation)
+    population = sort_by_fitness(population)
+    write_population(file_name, "a", population, generation)
+    generation = generation + 1
+
+    print()
+    print("Fittest genome in population:")
+    print(population[#population])
   end
+
+  print()
+  print("Final fittest genome:")
+  print(population[#population])
+
+  write_str(file_name, "a", "\nPopulation size = " .. population_size .. "\n")
+  write_str(file_name, "a", "Children size = " .. children_size .. "\n")
+  write_str(file_name, "a", "selection rate = " .. selection_rate .. "\n")
+  write_str(file_name, "a", "Mutation rate = " .. mutation_rate .. "\n")
+  write_str(file_name, "a", "Move limit = " .. move_limit .. "\n")
 
 end
