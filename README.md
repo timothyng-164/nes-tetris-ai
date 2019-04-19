@@ -48,16 +48,24 @@
 
 
 ##### Algorithm details
-To start the algorithm, we create the initial population that contains genomes with randomly generated heuristic parameters ranging from -1 to 1. Then until the generation limit is reached, we create new children using selection and crossover and remove the least fit genomes from the current population.
+To start the algorithm, we create the initial population that contains genomes with randomly generated heuristic parameters ranging from -1 to 1.
+
+Then until the generation limit is reached, we create new children using selection and crossover and remove the least fit genomes from the current population.
+
 During selection, we get a fixed percentage of randomly selected genomes from current population. Then from the selected genomes, crossover is performed by combining the 2 fittest genomes to create a child. The crossover is weighted by fitness (child will resemble the fitter parent more).
+
 And during crossover, mutation has a small chance of occuring to preserve diversity. When mutation occurs, one parameter will be randomly selected for the child and it random value from -1 to 1 will be added.
+
 When removing genomes with lowest fitness from population, we remove the same amount of the children generated. Then we add new children to population. Once the alorithm terminates, we can analyze the last population the determine the best heuristic parameters to play Tetris.
 
 ## Population Analysis
 After the algorithm is completed, a csv file of the populations is given.
 A python script is used to summarize the data.
-![2 tables of population data](/images/population.png)
-The final reward function is calculated using the fittest 50% of the last generation
+
+![2 tables of population data](/images/population.PNG)
+
+The final reward function is calculated using the fittest 50% of the last generation.
+
 Reward = (0.433 * aggregate_height) + (-0.860 * complete_lines) + (-0.824 * holes) + (-0.343 * bumpiness)
 
 
