@@ -79,20 +79,20 @@ Reward = (-0.860 * aggregate_height) + (0.433 * complete_lines) + (-0.824 * hole
 
 ## Important Files
 * lua_scripts:
-  * "play_fittest.lua" - plays the game once with the fittest heuristic coefficients
-  * “main.lua” - runs genetic algorithm that finds the fittest heuristic coefficient
-    * outputs a csv file of information on each population
-  * “genetic_alg.lua” - contains functions to implement genetic algorithm
-  * “play_game.lua” - contains main logic for AI to play the game once
-    * must be given heuristic coefficients
-    * returns the score of a single play-through after game over or move limit exceeded
-  * “playfield.lua” -  contains functions to read and analyze the playfield
-  * “pieces.lua” - contains information about the game pieces including piece rotation, pieces represented as 2D arrays, and starting column where each piece drops
-  * “best_move.lua” - contains functions the determine the best move based on the playfield and current piece
-
+    * "play_fittest.lua" - plays the game once with the fittest heuristic coefficients
+    * “main.lua” - runs genetic algorithm that finds the fittest heuristic coefficient
+        * outputs a csv file of information on each population
+        *  uses all lua files below
+    * “genetic_alg.lua” - contains functions to implement genetic algorithm
+    * “play_game.lua” - contains main logic for AI to play the game once
+        * must be given heuristic coefficients
+        * returns the score of a single play-through after game over or move limit exceeded
+    * “playfield.lua” -  contains functions to read and analyze the playfield
+    * “pieces.lua” - contains information about the game pieces including piece rotation, pieces represented as 2D arrays, and starting column where each piece drops
+    * “best_move.lua” - contains functions the determine the best move based on the playfield and current piece
 * "process-populations.py" - analyzes populations outputted by main.lua
-  * prints a table showing the standard deviation and average of each heuristic coefficient
-  * this program needs the population csv file outputted by main.lua as the first argument
+    * prints a table showing the standard deviation and average of each heuristic coefficient
+    * this program needs the population csv file outputted by main.lua as the first argument
 * “Tetris (U) [!].zip” - the game rom used by the emulator
 
 
