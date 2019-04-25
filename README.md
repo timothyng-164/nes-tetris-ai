@@ -5,12 +5,15 @@
 2. Clone this repository
 3. Open FCEUX
 4. File -> Open ROM -> select "Tetris (U) [!]"
-5. In the game, go to select game type A and whichever music you want.
+5. In the game, select game type A and whichever music you want.
 6. In the level select screen, hover over level 9   
     * ![tetris level select](/images/save_state_1.png)
 7. Save state to 1 (shift + F1)
-8. File -> Lua -> New Lua Script Window -> Browse -> select "lua_scripts/main.lua"
-    * To run game at normal speed, edit main.lua and comment out "emu.speedmode("turbo")"
+8. File -> Lua -> New Lua Script Window -> Browse ->
+  * To run genetic algorithm, select "lua_scripts/main.lua"
+  * To run play the game once with the best heuristics, select "lua_scripts/play_fittest.lua"
+  * To run game at normal speed, edit play_game.lua and comment out "emu.speedmode("turbo")"
+
 
 ## Game Mechanics
 * 20 x 10 playfield
@@ -66,14 +69,36 @@ A python script is used to summarize the data.
 
 The final reward function is calculated using the fittest 50% of the last generation.
 
-Reward = (0.433 * aggregate_height) + (-0.860 * complete_lines) + (-0.824 * holes) + (-0.343 * bumpiness)
+Reward = (-0.860 * aggregate_height) + (0.433 * complete_lines) + (-0.824 * holes) + (-0.343 * bumpiness)
 
 
 ## Possible Improvements
 * Utilize tucks and spins to reduce amount of holes in game
 * Add new heuristics or improve current ones
 
+
+## Important Files
+* lua_scripts:
+  * "play_fittest.lua" - plays the game once with the fittest heuristic coefficients
+  * “main.lua” - runs genetic algorithm that finds the fittest heuristic coefficient
+    * outputs a csv file of information on each population
+  * “genetic_alg.lua” - contains functions to implement genetic algorithm
+  * “play_game.lua” - contains main logic for AI to play the game once
+    * must be given heuristic coefficients
+    * returns the score of a single play-through after game over or move limit exceeded
+  * “playfield.lua” -  contains functions to read and analyze the playfield
+  * “pieces.lua” - contains information about the game pieces including piece rotation, pieces represented as 2D arrays, and starting column where each piece drops
+  * “best_move.lua” - contains functions the determine the best move based on the playfield and current piece
+
+* "process-populations.py" - analyzes populations outputted by main.lua
+  * prints a table showing the standard deviation and average of each heuristic coefficient
+  * this program needs the population csv file outputted by main.lua as the first argument
+* “Tetris (U) [!].zip” - the game rom used by the emulator
+
+
 ## References
 * Borrowed heuristics model from [Yiyuan Lee](https://codemyroad.wordpress.com/2013/04/14/tetris-ai-the-near-perfect-player/)
 * NES Tetris memory [addresses](http://www.thealmightyguru.com/Games/Hacking/Wiki/index.php?title=Tetris)
 * FCEUX Lua scripting [guide](http://www.fceux.com/web/help/fceux.html?LuaScripting.html)
+* Lua scripting [documentation] (http://www.lua.org/pil/contents.html)
+* FCEUX Emulator [download] (http://www.fceux.com/web/download.html)
