@@ -100,5 +100,5 @@ Reward = (-0.860 * aggregate_height) + (0.433 * complete_lines) + (-0.824 * hole
 * Borrowed heuristics model from [Yiyuan Lee](https://codemyroad.wordpress.com/2013/04/14/tetris-ai-the-near-perfect-player/)
 * NES Tetris memory [addresses](http://www.thealmightyguru.com/Games/Hacking/Wiki/index.php?title=Tetris)
 * FCEUX Lua scripting [guide](http://www.fceux.com/web/help/fceux.html?LuaScripting.html)
-* Lua scripting [documentation] (http://www.lua.org/pil/contents.html)
-* FCEUX Emulator [download] (http://www.fceux.com/web/download.html)
+* Lua scripting [documentation](http://www.lua.org/pil/contents.html)
+* FCEUX Emulator [download](http://www.fceux.com/web/download.html)
